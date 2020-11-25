@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <!-- <link rel="stylesheet" href="/stylesheets/normalize.css"> -->
+    <script>
+      function loadSchedules() {
+        let request = new XMLHttpRequest();
+        request.open('GET', 'http://localhost:3000/api/schedules');
+
+        request.responseType = "json";
+        request.timeout = 5000;
+
+        request.addEventListener('load', event => {
+          const schedules = request.response;
+          const staff = [];
+          const tallies = [];
+
+          if (schedules.length > 0) {
+            schedules.forEach(({staff_id}) => {
+              const key = `staff ${staff_id}`;
+              if (staff.indexOf(key) === -1) {
+                staff.push(key);
+                tallies.push(1);
+              } else {
+                tallies[staff.indexOf(key)] += 1;
+              }
+            });
+            alert(tallies.map((_, index) => `${staff[index]}: ${tallies[index]}`).join("\n"))
+          } else {
+            alert("There are currently no availabilities for bookings")
+          }
+          
+        });
+
+        request.addEventListener('timeout', event => {
+          alert("Your request timed out.");
+        });
+
+        request.addEventListener('loadend', event => {
+          alert("Your request has finished loading");
+        })
+
+        request.send();
+      }
+
+      document.addEventListener('DOMContentLoaded', loadSchedules);
+
+    </script>
+  </head>
+  <body>
+    <div class="app">
+      
+    </div>
+  </body>
+</html>

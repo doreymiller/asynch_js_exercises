@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Bold Element + Custom</title>
+    <script>
+      function makeBold(element) {
+        element.style.fontWeight = 'bold';
+        let customEvent = new CustomEvent('bolded')
+        
+        element.dispatchEvent(customEvent);
+      }
+
+
+    </script>
+  </head>
+  <body>
+    <section>Hello World</section>
+    <p>Greetings!</p>
+    <script>
+      let sectionElement = document.querySelector('section');
+
+      sectionElement.addEventListener('bolded', event => {
+        sectionElement.classList.add('highlight');
+      });
+
+      makeBold(sectionElement);
+
+      console.log(sectionElement.classList.contains('highlight'));
+    </script>
+  </body>
+</html> 

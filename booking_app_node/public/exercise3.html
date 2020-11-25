@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Exercise 2</title>
+    <style>
+      dl {
+        border: 3px double gray;
+        padding: 5px;
+        
+      }
+      dt {
+        float: left;
+        clear: left;
+        width: 100px;
+        text-align: right;
+        font-weight: bold;
+        color: #f0595b;
+      }
+      dt::after {
+        content: ":";
+      }
+      dd {
+        margin-left: 110px;
+        padding-bottom: 5px;
+        width: 200px;
+      }
+      input[type="submit"] {
+        color: #fff;
+        background: #f0595b;
+        border-color: #f0595b;
+        border-radius: 5px;
+        width: 100px;
+        height: 50px;
+      }
+      .select_input {
+        width: 200px;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <input type="button" value="Add more schedules">
+    <form method="post" action="/api/schedules">
+     
+      <div id="schedules">
+
+      </div>
+      <!-- <input type="submit"> -->
+    </form>
+    <script>
+
+      let staff = [];
+      let numSchedules = 0;
+      const container = document.querySelector('#schedules');
+      const moreSchedules = document.querySelector("input[type='button']");
+      const form = document.querySelector('form');
+
+      moreSchedules.addEventListener('click', event => {
+        event.preventDefault();
+        addScheduleUI();
+      });
+
+      (() => {
+        let request = new XMLHttpRequest();
+        request.open('GET', '/api/staff_members');
+
+        request.responseType = "json";
+        request.send();
+        request.addEventListener('load', event => {
+          console.log(request.response);
+          staff = request.response;
+        });
+      })();
+
+      function elementWithAttributes(element, attributes) {
+        let el = document.createElement(element);
+        for (let att of Object.keys(attributes)) {
+          el[att] = attributes[att];
+        }
+        return el;
+      }
+
+      function addScheduleUI() {
+        numSchedules += 1;
+
+        let dl = document.createElement('dl');
+        let staffNameDT = document.createElement('dt');
+        let staffNameDD = document.createElement('dd');
+        
+        let staffLabel = elementWithAttributes('label', { for: `staff_name_${numSchedules}`, textContent: "Staff Name"});
+        let staffSelect = elementWithAttributes('select', { name: `staff_${numSchedules}`, id: `staff_name_${numSchedules}` });
+        staffSelect.classList.add('select_input');
+
+        staff.forEach(member => {
+          let el = document.createElement('option', { value: member.id });
+          el.textContent = member.name;
+          staffSelect.appendChild(el);
+        });
+
+        let dateDT = document.createElement('dt');
+        let dateDD = document.createElement('dd');
+        let dateLabel = elementWithAttributes('label', { for: `date_${numSchedules}`, textContent: "Date" });
+        let dateInput = elementWithAttributes('input', { type: 'date', name: `date_${numSchedules}`, id: `date_${numSchedules}`});
+        dateInput.classList.add('select_input');
+
+        let timeDT = document.createElement('dt');
+        let timeDD = document.createElement('dd');
+        let timeLabel = elementWithAttributes('label', { for: `time_${numSchedules}`, textContent: "Time" });
+        let timeInput = elementWithAttributes('input', { type: 'time', name: `time_${numSchedules}`, id: `time_${numSchedules}` });
+        timeInput.classList.add('select_input');
+
+        container.appendChild(dl);
+        [staffNameDT, staffNameDD, dateDT, dateDD, timeDT, timeDD].forEach(el => {
+          dl.appendChild(el);
+        });
+       
+        staffNameDT.appendChild(staffLabel);
+        staffNameDD.appendChild(staffSelect);
+        dateDT.appendChild(dateLabel);
+        dateDD.appendChild(dateInput);
+        timeDT.appendChild(timeLabel);
+        timeDD.appendChild(timeInput);
+
+        let submitButton = document.querySelector("input[type='submit']");
+        if (!submitButton) {
+          let submit = elementWithAttributes('input', { type: 'submit' });
+          form.appendChild(submit);
+        }
+
+      }
+   
+      function formDataToJSON(formData) {
+        const jsonData = [];
+
+        for (let idx = 1; idx <= numSchedules; idx += 1) {
+          let schedule = {};
+          schedule.staff_id = form[`staff_name_${idx}`].value;
+          schedule.date = form[`date_${idx}`].value;
+          schedule.time = form[`time_${idx}`].value;
+          jsonData.push(schedule);
+        }
+
+        return { schedules: jsonData };
+      }
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const json = JSON.stringify(formDataToJSON(formData));
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('POST', form.action);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.responseType = "json";
+        xhr.send(json);
+
+        xhr.addEventListener('load', event => {
+          switch(xhr.status) {
+            case 201:
+              const response = xhr.response;
+              alert(`Schedules added`);
+              form.reset();
+              break;
+            case 400:
+              alert('Please check your inputs');
+          }
+        });
+
+      });
+
+    </script>
+  </body>
+</html>

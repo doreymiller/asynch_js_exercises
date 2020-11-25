@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Exercise 2</title>
+    <style>
+    
+    </style>
+    
+  </head>
+  <body>
+    <h1>Schedules</h1>
+    <form method="post" action="/api/bookings" id="book_schedule">
+      
+      <label for="id">Please select one schedule</label>
+      <select name="id" id="id">
+      </select>
+      <br><br>
+      <label for="student_email">Email:</label>
+      <input type="email" name="student_email" id="student_email">
+      <input type="submit" id="booking_submit">
+        
+    </form>
+    <script>
+      const scheduleForm = document.querySelector("#book_schedule");
+      const scheduleSelect = document.querySelector("#id");
+      const emailBooking = document.querySelector("#student_email");
+      const submitBooking = document.querySelector("#booking_submit");
+
+      let scheduleData;
+      let staff;
+
+      function updateScheduleSelect() {
+        
+        for (let schedule of scheduleData) {
+          let staffName = staff.find(member => member["id"] === schedule["staff_id"]);
+
+          if (staffName) {
+            let optionText = `${staffName.name} | ${schedule.date} | ${schedule.time}`;
+            let option = document.createElement("option");
+            option.setAttribute('value', Number(schedule.id));
+            option.textContent = optionText;
+            scheduleSelect.appendChild(option);
+          }
+        }
+      }
+
+      function loadStaff() {
+        let request = new XMLHttpRequest();
+        request.open('GET', '/api/staff_members');
+        request.responseType = "json";
+        request.send();
+
+        request.addEventListener('load', event => {
+          staff = request.response;
+          updateScheduleSelect();
+        });
+        
+      }
+
+      function logJSON(data) {
+        for (let el of data) {
+          for (let key of Object.keys(el)) {
+            console.log(`${key}: ${el[key]}`);
+          }
+        }
+      }
+
+      function formDataToJSON(formData) {
+        const json = {};
+
+        for (const pair of formData.entries()) {
+          json[pair[0]] = pair[1];
+        }
+
+        return json;
+      }
+
+      function filterScheduleData(data) {
+        return data.filter(schedule => !schedule.student_email);
+      }
+
+      function addBookingSequenceForm(bookingFormData, sequence) {
+        console.log("addBOokingSequenceForm");
+        let newStudentSection = document.createElement("div");
+        let body = document.querySelector("body");
+
+        newStudentSection.style.backgroundColor = "gray";
+        newStudentSection.style.padding = "10px";
+        newStudentSection.style.marginTop = "10px";
+
+        let h1 = document.createElement("h1");
+        h1.textContent = "Please provide new student details";
+
+        newStudentSection.appendChild(h1);
+
+        let newStudentForm = document.createElement("form");
+        newStudentForm.setAttribute("id", "new_student_form");
+        newStudentForm.setAttribute("action", "/api/students");
+
+        let emailLabel = document.createElement("label");
+        emailLabel.setAttribute("for", "email");
+        emailLabel.textContent = "Email:";
+
+        let emailInput = document.createElement("input");
+        emailInput.setAttribute("id", "email");
+        emailInput.setAttribute("type", "email");
+        emailInput.setAttribute("name", "email");
+        console.log("email_booking", bookingFormData);
+        emailInput.value = bookingFormData.get("student_email");
+
+        let nameLabel = document.createElement("label");
+        nameLabel.setAttribute("for", "name_input");
+        nameLabel.textContent = "Name:";
+
+        let nameInput = document.createElement("input");
+        nameInput.setAttribute("id", "name");
+        nameInput.setAttribute("type", "text");
+        nameInput.setAttribute("name", "name");
+
+        let bookingLabel = document.createElement("label");
+        bookingLabel.setAttribute("for", "booking_sequence");
+        bookingLabel.textContent = "Booking Sequence:";
+
+        let bookingInput = document.createElement("input");
+        bookingInput.setAttribute("id", "booking_sequence");
+        bookingInput.setAttribute("name", "booking_sequence");
+        bookingInput.setAttribute("type", "text");
+        bookingInput.value = sequence;
+
+        let submitButton = document.createElement("input");
+        submitButton.setAttribute("type", "submit");
+
+        newStudentForm.appendChild(emailLabel);
+        newStudentForm.appendChild(emailInput);
+        newStudentForm.appendChild(document.createElement('br'));
+        newStudentForm.appendChild(nameLabel);
+        newStudentForm.appendChild(nameInput);
+        newStudentForm.appendChild(document.createElement('br'));
+        newStudentForm.appendChild(bookingLabel);
+        newStudentForm.appendChild(bookingInput);
+        newStudentForm.appendChild(document.createElement('br'));
+        newStudentForm.appendChild(submitButton);
+        newStudentForm.appendChild(document.createElement('br'));
+
+        newStudentSection.appendChild(newStudentForm);
+        body.appendChild(newStudentSection);
+
+        newStudentForm.addEventListener("submit", event => {
+          event.preventDefault();
+
+          let formData = new FormData(newStudentForm);
+          let data = JSON.stringify(formDataToJSON(formData));
+
+          let request = new XMLHttpRequest();
+          request.open("POST", newStudentForm.action);
+          request.setRequestHeader("Content-type", "application/json");
+
+          console.log("sending student data:", data);
+
+          request.addEventListener('load', event => {
+            if (request.status === 201) {
+              newStudentForm.reset();
+
+              let request2 = new XMLHttpRequest();
+              bookingFormData.set("student_email", formData.get("student_email"));
+              scheduleForm.dispatchEvent(new Event("submit", { cancelable: true }));
+            }
+          });
+
+          request.send(data);
+        });
+      }
+
+      (() => {
+        let request = new XMLHttpRequest();
+        request.open('GET', '/api/schedules');
+        request.responseType = "json";
+
+        request.addEventListener('load', event => {
+          scheduleData = filterScheduleData(request.response);
+          loadStaff();
+        });
+
+        request.send();
+      })();
+
+      scheduleForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        let formData = new FormData(scheduleForm);
+        let data = JSON.stringify(formDataToJSON(formData));
+        
+        let request = new XMLHttpRequest();
+        request.open('POST', scheduleForm.action);
+        request.setRequestHeader('Content-type', 'application/json');
+      
+        request.addEventListener('load', () => {
+          if (request.status === 404) {
+            console.log('error', request.responseText);
+            let bookingSequence = request.responseText.split(":")[1].trim();
+            addBookingSequenceForm(formData, bookingSequence);
+          } else if (request.status === 204) {
+            alert('booked');
+            window.location.href = "/exercise4.html";
+          }
+        });
+
+        request.send(data);
+      });
+      
+    </script>
+  </body>
+</html>

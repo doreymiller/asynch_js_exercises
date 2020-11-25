@@ -1,0 +1,22 @@
+body {
+  background-color: purple;
+  color: white;
+  font-size: 24px;
+}
+
+#clock {
+  width: 100%;
+  text-align: center;
+}
+
+#actions {
+  width: 200px;
+  text-align: center;
+  margin: auto;
+}
+
+button {
+  display: inline-block;
+  border-color: white;
+  border-radius: 4px;
+}

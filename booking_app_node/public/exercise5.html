@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Exercise 2</title>
+    <style>
+    
+    </style>
+    
+  </head>
+  <body>
+    <h1>Bookings</h1>
+    <div id="bookings"></div>
+      
+    <script>
+
+      function standardGET(url, [resolve, reject]) {
+        let request = new XMLHttpRequest();
+        request.open('GET', url);
+        request.responseType = "json";
+
+        request.addEventListener("load", event => {
+          if (request.status === 200) {
+            resolve(request.response);
+          } else {
+            reject(request.response);
+          }
+        });
+
+        return request;
+      }
+
+      function loadBookings() {
+        return new Promise((resolve, reject) => {
+          let request = standardGET('/api/bookings', [resolve, reject]);
+          request.send();
+        });
+      }
+
+      function showBookings(bookingResults) {
+        const bookingsElement = document.querySelector("#bookings");
+        const bookingsList = document.createElement("ul");
+        
+        [...bookingResults].forEach((bookingDate, idx) => {
+          let bookingItem = document.createElement("li");
+          bookingItem.setAttribute("id", `booking_${idx}`);
+          bookingItem.textContent = bookingDate;
+          bookingsList.appendChild(bookingItem);
+         
+          bookingItem.addEventListener("click", (event) => {
+            showBookingDetails(bookingDate, idx);
+          });
+        });
+
+        bookingsElement.appendChild(bookingsList);
+      }
+
+      function loadBookingDetails(bookingDate) {
+        return new Promise((resolve, reject) => {
+          let request = standardGET(`/api/bookings/${bookingDate}`, [resolve, reject]);
+          request.send();
+        });
+      }
+
+      async function showBookingDetails(bookingDate, bookingIdx) {
+        try {
+          const details = await loadBookingDetails(bookingDate);
+          const bookingElement = document.querySelector(`#booking_${bookingIdx}`);
+          const subList = document.createElement("ul");
+
+          details.forEach(booking => {
+            const subListDetails = document.createElement("li");
+            subListDetails.textContent = booking.join(" | ");
+            subList.appendChild(subListDetails);
+          });
+          
+          bookingElement.appendChild(subList);
+          
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      async function createPage() {
+        try {
+          const bookingsArr = await loadBookings();
+          showBookings(bookingsArr);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      createPage();
+    </script>
+  </body>
+</html>

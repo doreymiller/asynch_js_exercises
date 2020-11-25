@@ -1,0 +1,107 @@
+body {
+  background-color: green;
+  padding: 10px 20px;
+  color: white;
+}
+
+#modal-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+}
+
+#modal {
+  /* display: block; */
+  position: absolute;
+  box-sizing: border-box;
+  background-color: white;
+  color: black;
+  padding: 20px;
+  width: 400px;
+  height: 200px;
+  top: 150px;
+  left: 50%;
+  margin-left: -200px;
+  z-index: 10;
+}
+
+#actions {
+  display: block;
+  position: relative;
+  top: 90px;
+  left: 280px;
+}
+
+.hide {
+  display: none;
+  /* opacity: 0; */
+}
+
+.show {
+  display: block;
+  /* opacity: 1; */
+}
+
+ul {
+  list-style: none;
+}
+
+#todos li {
+  padding: 16px 20px 0 20px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #222;
+  height: 50px;
+  margin-bottom: 20px;
+  text-indent: 0;
+  border-radius: 5px;
+  position: relative;
+}
+
+.delete {
+  color: red;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  display: inline-block;
+  overflow: hidden;
+  right: 20px;
+  cursor: pointer;
+}
+
+.context_menu {
+  position: absolute;
+  width: 200px;
+  background: #ccc;
+  border-radius: 4px;
+  z-index: 3;
+  top: 0;
+  left: 0;
+}
+
+.context_menu ul {
+  list-style: none;
+  padding: 0px;
+  margin: 0;
+}
+
+.context_menu li {
+  margin-left: 0;
+  height: 30px;
+  border-top: 1px solid #fff;
+  padding: 12px 0 0 10px;
+  cursor: pointer;
+}
+
+.context_menu li:hover {
+  background: #bbb;
+  color: #fff;
+}
+
+.context_menu li:first-child {
+  border-top: none;
+}

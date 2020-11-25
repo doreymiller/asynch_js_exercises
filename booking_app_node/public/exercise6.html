@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Exercise 2</title>
+    <style>
+    
+    </style>
+    
+  </head>
+  <body>
+    
+    
+      
+    <script>
+      function cancelSchedule(scheduleID) {
+        let request = new XMLHttpRequest();
+        request.open('DELETE', `/api/schedules/${scheduleID}`);
+
+        request.addEventListener('load', event => {
+          if (request.status === 204) {
+            alert("schedule canceled");
+          } else {
+            alert(request.responseText);
+          }
+        });
+
+        request.send();
+      }
+
+      function cancelBooking(bookingID) {
+        let request = new XMLHttpRequest();
+        request.open('PUT', `/api/bookings/${bookingID}`);
+
+        request.addEventListener('load', event => {
+          if (request.status === 204) {
+            alert('booking canceled');
+          } else {
+            alert(request.responseText);
+          }
+        });
+
+        request.send();
+      }
+      
+    </script>
+  </body>
+</html>

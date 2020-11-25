@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Exotic Animals</title>
+    <link rel="stylesheet" href="stylesheets/exotic_animals.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Exotic Animals</h1>
+      <div id="gallery">
+        <figure>
+            <img src="images/blackbuck.jpg" alt="blackbuck" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/genet.jpg" alt="genet" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/golden_pheasant.jpg" alt="golden_pheasant" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/greater_bird_of_paradise.jpg" alt="greater_bird_of_paradise" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/lined_butterflyfish.jpg" alt="lined_butterflyfish" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/quetzal.jpg" alt="quetzal" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/rainbow_lorikeet.jpg" alt="rainbow_lorikeet" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+        <figure>
+            <img src="images/vampire_squid.jpg" alt="vampire_squid" />
+            <figcaption>Some text here</figcaption>
+        </figure>
+      </div>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", e => {
+        let animals = document.querySelectorAll("figure");
+        animals.forEach(animal => {
+          animal.addEventListener("click", e => showToolTip(e));
+          animal.addEventListener("mouseout", e => hideToolTip(e));
+        });
+      });
+
+      function showToolTip(e) {
+        e.preventDefault();
+        let toolTip = e.currentTarget.querySelector("figcaption");
+        console.log(e.currentTarget);
+        console.log(toolTip);
+        toolTip.classList.remove("hide");
+        toolTip.classList.add("show");
+        
+      }
+
+      function hideToolTip(e) {
+        e.preventDefault();
+        let toolTip = e.currentTarget.querySelector("figcaption");
+        toolTip.classList.remove("show");
+        toolTip.classList.add("hide");
+      }
+    </script>
+  </body>
+</html>
